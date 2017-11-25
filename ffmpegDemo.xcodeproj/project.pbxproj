@@ -28,7 +28,6 @@
 		372ADDC41FC6CA9C00D0F3A3 /* AAPLEAGLLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 372ADDC21FC6CA9C00D0F3A3 /* AAPLEAGLLayer.m */; };
 		372ADDC81FC6DD1500D0F3A3 /* OpenGLView20.mm in Sources */ = {isa = PBXBuildFile; fileRef = 372ADDC71FC6DD1500D0F3A3 /* OpenGLView20.mm */; };
 		372DCA331FC819E500F75853 /* LLCAudioDataQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 372DCA321FC819E500F75853 /* LLCAudioDataQueue.m */; };
-		373C9D621FB9AACF0073D456 /* gaosan.flv in Resources */ = {isa = PBXBuildFile; fileRef = 373C9D611FB9AACF0073D456 /* gaosan.flv */; };
 		374D00421F72200400607E06 /* test.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 374D00411F72200400607E06 /* test.mp4 */; };
 		37788EC31FBA9B8B00086B78 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37788EC21FBA9B7700086B78 /* AVFoundation.framework */; };
 		377890321FBADC8B00086B78 /* lll.mov in Resources */ = {isa = PBXBuildFile; fileRef = 377890311FBADC8B00086B78 /* lll.mov */; };
@@ -76,7 +75,6 @@
 		372ADDC71FC6DD1500D0F3A3 /* OpenGLView20.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = OpenGLView20.mm; sourceTree = "<group>"; };
 		372DCA311FC819E500F75853 /* LLCAudioDataQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LLCAudioDataQueue.h; sourceTree = "<group>"; };
 		372DCA321FC819E500F75853 /* LLCAudioDataQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LLCAudioDataQueue.m; sourceTree = "<group>"; };
-		373C9D611FB9AACF0073D456 /* gaosan.flv */ = {isa = PBXFileReference; lastKnownFileType = file; path = gaosan.flv; sourceTree = "<group>"; };
 		374D00411F72200400607E06 /* test.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = test.mp4; sourceTree = "<group>"; };
 		37788EC21FBA9B7700086B78 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		377890311FBADC8B00086B78 /* lll.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = lll.mov; sourceTree = "<group>"; };
@@ -258,7 +256,6 @@
 			isa = PBXGroup;
 			children = (
 				374D00411F72200400607E06 /* test.mp4 */,
-				373C9D611FB9AACF0073D456 /* gaosan.flv */,
 				377890311FBADC8B00086B78 /* lll.mov */,
 				37051D831F7170B80057A735 /* main.m */,
 			);
@@ -603,7 +600,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				37051D921F7170B80057A735 /* LaunchScreen.storyboard in Resources */,
-				373C9D621FB9AACF0073D456 /* gaosan.flv in Resources */,
 				37051D8F1F7170B80057A735 /* Assets.xcassets in Resources */,
 				377890321FBADC8B00086B78 /* lll.mov in Resources */,
 				37051D8D1F7170B80057A735 /* Main.storyboard in Resources */,
