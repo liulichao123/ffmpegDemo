@@ -8,9 +8,9 @@
 #import <AudioToolbox/AudioToolbox.h>
 #import <AVFoundation/AVFoundation.h>
 #import "TMAudioPCMPlayer.h"
-#import "LLCAudioDataQueue.h"
 #import "TMAVConfig.h"
-
+#import "ffplayer_decoder.h"
+//#import "ffplayer_decoder.h"
 #define MIN_SIZE_PER_FRAME 2048 //每帧最小数据长度
 static const int kNumberBuffers_play = 3;                              // 1
 typedef struct AQPlayerState
@@ -30,20 +30,26 @@ typedef struct AQPlayerState
 @implementation TMAudioPCMPlayer
 
 static void TMAudioQueueOutputCallback(void * inUserData, AudioQueueRef inAQ, AudioQueueBufferRef inBuffer) {
-    //从队列中获取数据()
-    NSData *data = [[LLCAudioDataQueue shareInstance] getData];
-    if (data) {
-        memset(inBuffer->mAudioData, 0, inBuffer->mAudioDataByteSize);
-        memcpy(inBuffer->mAudioData, data.bytes, data.length);
-        //                inBuffer->mAudioData //内存拷贝会导致内存泄漏
-        inBuffer->mAudioDataByteSize = (UInt32)data.length;
-        OSStatus status = AudioQueueEnqueueBuffer(inAQ, inBuffer, 0, NULL);
-        if (status != noErr) {
-            NSLog(@"Error: audio queue palyer  enqueue error: %d",(int)status);
+    uint8_t *data = malloc(4096);
+    UInt32 size = 0;
+    for (; ;) {
+        size = audio_paly_callback(data);
+        if (size && data) {
+            memset(inBuffer->mAudioData, 0, inBuffer->mAudioDataByteSize);
+            memcpy(inBuffer->mAudioData, data, size);
+            inBuffer->mAudioDataByteSize = size;
+            OSStatus status = AudioQueueEnqueueBuffer(inAQ, inBuffer, 0, NULL);
+            if (status != noErr) {
+                NSLog(@"Error: audio queue palyer  enqueue error: %d",(int)status);
+            } else {
+                break;
+            }
+        } else {
+            AudioQueuePause(inAQ);
+            break;
         }
     }
-    //释放这个inBuffer,
-//    AudioQueueFreeBuffer(inAQ, inBuffer);
+    free(data);
 }
 
 - (instancetype)initWithConfig:(TMAudioConfig *)config
@@ -108,31 +114,7 @@ static void TMAudioQueueOutputCallback(void * inUserData, AudioQueueRef inAQ, Au
     AudioQueueStart (_aqps.mQueue,NULL);
 }
 
-- (void)playPCMData:(NSData *)data {
-    AudioQueueBufferRef inBuffer;
-    AudioQueueAllocateBuffer(_aqps.mQueue, (UInt32)data.length, &inBuffer);
-    memcpy(inBuffer->mAudioData, data.bytes, data.length);
-    inBuffer->mAudioDataByteSize = (UInt32)data.length;
-    OSStatus status = AudioQueueEnqueueBuffer(_aqps.mQueue, inBuffer, 0, NULL);
-    if (status != noErr) {
-        NSLog(@"Error: audio queue palyer  enqueue error: %d",(int)status);
-    }
-    AudioQueueStart(_aqps.mQueue, NULL);
-}
 
-- (void)playPCMData:(uint8_t *)data size:(UInt32)size {
-    AudioQueueBufferRef inBuffer;
-    AudioQueueAllocateBuffer(_aqps.mQueue, size, &inBuffer);
-    memcpy(inBuffer->mAudioData, data, size);
-    inBuffer->mAudioDataByteSize = (UInt32)size;
-    OSStatus status = AudioQueueEnqueueBuffer(_aqps.mQueue, inBuffer, 0, NULL);
-    if (status != noErr) {
-        NSLog(@"Error: audio queue palyer  enqueue error: %d",(int)status);
-    }
-    AudioQueueStart(_aqps.mQueue, NULL);
-}
-
-//不需要该函数，
 //- (void)pause {
 //     AudioQueuePause(_aqps.mQueue);
 //}

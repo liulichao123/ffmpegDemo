@@ -22,12 +22,17 @@
 		37272A9D1FC985CB00CA5128 /* readme in Resources */ = {isa = PBXBuildFile; fileRef = 37272A9C1FC985CB00CA5128 /* readme */; };
 		3729A0651FC7069000191F75 /* TMAudioPCMPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 3729A0631FC7069000191F75 /* TMAudioPCMPlayer.m */; };
 		3729A0681FC706B500191F75 /* TMAVConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 3729A0671FC706B500191F75 /* TMAVConfig.m */; };
+		3729AC3F1FCAB4B100C392A8 /* FFPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 3729AC3E1FCAB4B100C392A8 /* FFPlayer.m */; };
 		372ADDB41FC6A54B00D0F3A3 /* decode_video.c in Sources */ = {isa = PBXBuildFile; fileRef = 372ADDB31FC6A54B00D0F3A3 /* decode_video.c */; };
 		372ADDB61FC6A95900D0F3A3 /* demuxing_decoding.c in Sources */ = {isa = PBXBuildFile; fileRef = 372ADDB51FC6A95900D0F3A3 /* demuxing_decoding.c */; };
 		372ADDBF1FC6BB6F00D0F3A3 /* FFmpegDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 372ADDBE1FC6BB6F00D0F3A3 /* FFmpegDecoder.m */; };
 		372ADDC41FC6CA9C00D0F3A3 /* AAPLEAGLLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 372ADDC21FC6CA9C00D0F3A3 /* AAPLEAGLLayer.m */; };
 		372ADDC81FC6DD1500D0F3A3 /* OpenGLView20.mm in Sources */ = {isa = PBXBuildFile; fileRef = 372ADDC71FC6DD1500D0F3A3 /* OpenGLView20.mm */; };
 		372DCA331FC819E500F75853 /* LLCAudioDataQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 372DCA321FC819E500F75853 /* LLCAudioDataQueue.m */; };
+		373548F11FCFAD640056C48E /* some.m in Sources */ = {isa = PBXBuildFile; fileRef = 373548F01FCFAD640056C48E /* some.m */; };
+		373548F41FCFEF7F0056C48E /* PlayerVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 373548F31FCFEF7F0056C48E /* PlayerVC.m */; };
+		373548FE1FCFFB6E0056C48E /* ffplayer_decoder.c in Sources */ = {isa = PBXBuildFile; fileRef = 373548FD1FCFFB6E0056C48E /* ffplayer_decoder.c */; };
+		3737E3DE1FE3802600A4225D /* SDL_Thread.c in Sources */ = {isa = PBXBuildFile; fileRef = 3737E3DC1FE3802600A4225D /* SDL_Thread.c */; };
 		374D00421F72200400607E06 /* test.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 374D00411F72200400607E06 /* test.mp4 */; };
 		37788EC31FBA9B8B00086B78 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 37788EC21FBA9B7700086B78 /* AVFoundation.framework */; };
 		377890321FBADC8B00086B78 /* lll.mov in Resources */ = {isa = PBXBuildFile; fileRef = 377890311FBADC8B00086B78 /* lll.mov */; };
@@ -65,6 +70,8 @@
 		3729A0641FC7069000191F75 /* TMAudioPCMPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TMAudioPCMPlayer.h; sourceTree = "<group>"; };
 		3729A0661FC706B500191F75 /* TMAVConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TMAVConfig.h; sourceTree = "<group>"; };
 		3729A0671FC706B500191F75 /* TMAVConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TMAVConfig.m; sourceTree = "<group>"; };
+		3729AC3D1FCAB4B100C392A8 /* FFPlayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FFPlayer.h; sourceTree = "<group>"; };
+		3729AC3E1FCAB4B100C392A8 /* FFPlayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FFPlayer.m; sourceTree = "<group>"; };
 		372ADDB31FC6A54B00D0F3A3 /* decode_video.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = decode_video.c; sourceTree = "<group>"; };
 		372ADDB51FC6A95900D0F3A3 /* demuxing_decoding.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = demuxing_decoding.c; sourceTree = "<group>"; };
 		372ADDBD1FC6BB6F00D0F3A3 /* FFmpegDecoder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FFmpegDecoder.h; sourceTree = "<group>"; };
@@ -75,6 +82,14 @@
 		372ADDC71FC6DD1500D0F3A3 /* OpenGLView20.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = OpenGLView20.mm; sourceTree = "<group>"; };
 		372DCA311FC819E500F75853 /* LLCAudioDataQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LLCAudioDataQueue.h; sourceTree = "<group>"; };
 		372DCA321FC819E500F75853 /* LLCAudioDataQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LLCAudioDataQueue.m; sourceTree = "<group>"; };
+		373548EF1FCFAD640056C48E /* some.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = some.h; sourceTree = "<group>"; };
+		373548F01FCFAD640056C48E /* some.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = some.m; sourceTree = "<group>"; };
+		373548F21FCFEF7F0056C48E /* PlayerVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlayerVC.h; sourceTree = "<group>"; };
+		373548F31FCFEF7F0056C48E /* PlayerVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PlayerVC.m; sourceTree = "<group>"; };
+		373548FC1FCFFB6E0056C48E /* ffplayer_decoder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ffplayer_decoder.h; sourceTree = "<group>"; };
+		373548FD1FCFFB6E0056C48E /* ffplayer_decoder.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ffplayer_decoder.c; sourceTree = "<group>"; };
+		3737E3DC1FE3802600A4225D /* SDL_Thread.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = SDL_Thread.c; sourceTree = "<group>"; };
+		3737E3DD1FE3802600A4225D /* SDL_Thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SDL_Thread.h; sourceTree = "<group>"; };
 		374D00411F72200400607E06 /* test.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = test.mp4; sourceTree = "<group>"; };
 		37788EC21FBA9B7700086B78 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		377890311FBADC8B00086B78 /* lll.mov */ = {isa = PBXFileReference; lastKnownFileType = video.quicktime; path = lll.mov; sourceTree = "<group>"; };
@@ -282,6 +297,8 @@
 		37272A9B1FC9838C00CA5128 /* class */ = {
 			isa = PBXGroup;
 			children = (
+				3737E3DC1FE3802600A4225D /* SDL_Thread.c */,
+				3737E3DD1FE3802600A4225D /* SDL_Thread.h */,
 				372DCA301FC819E500F75853 /* audioDataQueue */,
 				372ADDC01FC6C38A00D0F3A3 /* decoder */,
 				372ADDC11FC6CA9C00D0F3A3 /* VideoPlayer */,
@@ -294,6 +311,14 @@
 				37051D8B1F7170B80057A735 /* Main.storyboard */,
 				372ADDB51FC6A95900D0F3A3 /* demuxing_decoding.c */,
 				372ADDB31FC6A54B00D0F3A3 /* decode_video.c */,
+				373548F21FCFEF7F0056C48E /* PlayerVC.h */,
+				373548F31FCFEF7F0056C48E /* PlayerVC.m */,
+				3729AC3D1FCAB4B100C392A8 /* FFPlayer.h */,
+				3729AC3E1FCAB4B100C392A8 /* FFPlayer.m */,
+				373548FC1FCFFB6E0056C48E /* ffplayer_decoder.h */,
+				373548FD1FCFFB6E0056C48E /* ffplayer_decoder.c */,
+				373548EF1FCFAD640056C48E /* some.h */,
+				373548F01FCFAD640056C48E /* some.m */,
 			);
 			path = class;
 			sourceTree = "<group>";
@@ -615,15 +640,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				373548F11FCFAD640056C48E /* some.m in Sources */,
 				372ADDC41FC6CA9C00D0F3A3 /* AAPLEAGLLayer.m in Sources */,
 				3729A0651FC7069000191F75 /* TMAudioPCMPlayer.m in Sources */,
+				373548F41FCFEF7F0056C48E /* PlayerVC.m in Sources */,
+				3729AC3F1FCAB4B100C392A8 /* FFPlayer.m in Sources */,
 				372ADDC81FC6DD1500D0F3A3 /* OpenGLView20.mm in Sources */,
 				372DCA331FC819E500F75853 /* LLCAudioDataQueue.m in Sources */,
+				3737E3DE1FE3802600A4225D /* SDL_Thread.c in Sources */,
 				37051D8A1F7170B80057A735 /* ViewController.m in Sources */,
 				372ADDB41FC6A54B00D0F3A3 /* decode_video.c in Sources */,
 				372ADDBF1FC6BB6F00D0F3A3 /* FFmpegDecoder.m in Sources */,
 				37051D871F7170B80057A735 /* AppDelegate.m in Sources */,
 				372ADDB61FC6A95900D0F3A3 /* demuxing_decoding.c in Sources */,
+				373548FE1FCFFB6E0056C48E /* ffplayer_decoder.c in Sources */,
 				37051D841F7170B80057A735 /* main.m in Sources */,
 				3729A0681FC706B500191F75 /* TMAVConfig.m in Sources */,
 			);

@@ -8,22 +8,12 @@
 
 #import "FFmpegDecoder.h"
 #include <libavcodec/avcodec.h>
-#include <libavutil/timestamp.h>
 #include <libavformat/avformat.h>
-#include <libavutil/imgutils.h>
 #import <libswresample/swresample.h>
-#import <libavutil/samplefmt.h>
-
-
-typedef struct AudioFrame {
-    uint8_t *data;
-    int size;
-    int sample_rate;
-    
-} AudioFrame;
 
 @interface FFmpegDecoder ()
 @property (nonatomic, strong) dispatch_queue_t queue;
+
 @end
 
 @implementation FFmpegDecoder {
@@ -51,7 +41,7 @@ typedef struct AudioFrame {
 {
     self = [super init];
     if (self) {
-        _queue = dispatch_queue_create("queue", NULL);
+        _queue = dispatch_queue_create("__ffmpeg_decoder_queue__", NULL);
         av_register_all();
         fmt_ctx = NULL;
         video_code = NULL;
@@ -265,7 +255,7 @@ typedef struct AudioFrame {
 }
 //处理解码后的视频frame
 - (void)handleDecodedVideoFrame:(AVFrame *)frame {
-
+    [_delegate recivedDecodedVideoFrame:frame];
 }
 
 //处理解码后的音频frame

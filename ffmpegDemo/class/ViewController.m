@@ -9,68 +9,111 @@
 #import <AVFoundation/AVFoundation.h>
 #import "ViewController.h"
 #include <libavcodec/avcodec.h>
-#include <libavutil/timestamp.h>
 #include <libavformat/avformat.h>
-#include <libavutil/imgutils.h>
-#import <libswscale/swscale.h>
 #import <libswresample/swresample.h>
-#import <libavutil/samplefmt.h>
+#import <libavutil/time.h>
+
 
 #import "AAPLEAGLLayer.h"
 #import "OpenGLView20.h"
 #import "TMAudioPCMPlayer.h"
 #import "TMAVConfig.h"
 #import "LLCAudioDataQueue.h"
+#import "PlayerVC.h"
 
+/* no AV sync correction is done if below the minimum AV sync threshold */
+#define AV_SYNC_THRESHOLD_MIN 0.04
+/* AV sync correction is done if above the maximum AV sync threshold */
+#define AV_SYNC_THRESHOLD_MAX 0.1
+/* If a frame duration is longer than this, it will not be duplicated to compensate AV sync */
+#define AV_SYNC_FRAMEDUP_THRESHOLD 0.1
+/* no AV correction is done if too big error */
+#define AV_NOSYNC_THRESHOLD 10.0
+
+#define AV_SYNC_THRESHOLD  0.01
 
 @interface ViewController ()
 @property (nonatomic, strong) AAPLEAGLLayer *displayLayer;
 @property (nonatomic, strong) OpenGLView20 *glView;
 @property (nonatomic, strong) TMAudioPCMPlayer *player;
+@property (nonatomic, strong) PlayerVC *playerVC;
+
 @end
 
 @implementation ViewController {
     dispatch_queue_t queue;
     dispatch_queue_t audioPlayerQueue;
     SwrContext *swr;
+    AVStream *video_stream;
+    AVStream *audio_stream;
+
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    NSString *fileName = [[NSBundle mainBundle] pathForResource:@"test.mp4" ofType:nil];
+    _playerVC = [[PlayerVC alloc] initWithFile:fileName];
+    [self.view addSubview:_playerVC.glView];
+    [_playerVC start];
+}
 
-    _glView = [[OpenGLView20 alloc] initWithFrame:CGRectMake(0, 100, 240, 320)];
+- (void)test1{
+    _glView = [[OpenGLView20 alloc] initWithFrame:CGRectMake(70, 100, 240, 320)];
     [self.view addSubview:_glView];
     _player = [[TMAudioPCMPlayer alloc] initWithConfig:[TMAudioConfig defaultConifg]];
     queue = dispatch_queue_create("queue", NULL);
     audioPlayerQueue = dispatch_queue_create("atuioPlayerQueue", NULL);
     dispatch_async(queue, ^{
-        
         NSLog(@"开始解码");
         [self test];
     });
-    
 }
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     [_player start];
 }
 
+
+
 - (void)handleDecodeVideoFrame:(AVFrame *)frame {
-//    NSLog(@"%@",frame);
-    [_glView displayYUV420pData:frame];
-//    uint32_t size = frame->linesize[1] * frame->height;
-//    uint8_t *data = malloc(2*size);
-//    for (int i = 0; i < 2*size; i++) {
-//        if (i%2 == 0) {
-//            data[i] = frame->data[1][i/2];
-//        } else {
-//            data[i] = frame->data[2][i/2];
+    //av_q2d(video_stream->time_base) 这样计算出1个时间单位，它的时间体系和我们用的不太一样，需要转换
+    //计算总时长 秒
+//    double_t totalTimeLenth = video_stream->duration * av_q2d(video_stream->time_base);
+//    //计算应该在第多少秒显示
+//    double_t frameShowAtTime = frame->pts * av_q2d(video_stream->time_base);
+//    printf("%f, %f\n", totalTimeLenth, frameShowAtTime);
+//    printf("%lld, %lld, %lld\n", frame->pkt_duration, frame->pkt_dts, frame->pts);
+//
+    
+//    if (delay < 0 || delay > 1) {
+//        delay = last_video_delay;
+//    }
+//    last_video_delay = delay;
+//    last_video_pts = current_video_pts;
+//
+//    //根据Audio clock来判断Video播放的快慢
+//    //diff<0: video slow, diff>0: video quick
+//    double diff = audio_clock - current_video_pts;
+//    //同步阈值
+//    double threshold = (delay > AV_SYNC_THRESHOLD) ? delay : AV_SYNC_THRESHOLD;
+//    if (fabs(diff) < AV_NOSYNC_THRESHOLD) {
+//        if (diff < -threshold) { //慢了，delay设为0
+//            delay = 0;
+//        } else if (diff >= threshold) { //快了，加倍delay
+//            delay *= 2;
 //        }
 //    }
-
+//    video_delay_timer += delay;
+//    double actual_delay = video_delay_timer - (av_gettime() / 1000000.0);
+//    if (actual_delay <= 0.010)
+//        actual_delay = 0.010;
+//
+    
+    [_glView displayYUV420pData:frame];
 }
 
 - (void)handleDecodeAudioFrame:(AVFrame *)frame {
+    
     if (av_sample_fmt_is_planar(frame->format) || frame->format != AV_SAMPLE_FMT_S16) {
 //        int a = av_get_bytes_per_sample(frame->format);
 //        int perPlaneSize = av_get_bytes_per_sample(frame->format)*frame->nb_samples;
@@ -88,49 +131,39 @@
                 swr = NULL; return;
             }
         }
-        AVFrame *desFrame = av_frame_alloc();
-        desFrame->channel_layout = frame->channel_layout;
-        desFrame->sample_rate = frame->sample_rate;
-        desFrame->format = AV_SAMPLE_FMT_S16;
-        desFrame->nb_samples = frame->nb_samples;
-        ret = swr_convert_frame(swr, desFrame, frame);
-        int des_channels = av_get_channel_layout_nb_channels(desFrame->channel_layout);
-        int dse_size = av_samples_get_buffer_size(NULL, des_channels, desFrame->nb_samples, des_fmt, 0);
-        NSData *data1 = [NSData dataWithBytes:desFrame->data[0] length:dse_size];
-        av_frame_free(&desFrame);
-        [[LLCAudioDataQueue shareInstance] addData:data1];
-        return;
+//        //直接转换frame
+//        AVFrame *desFrame = av_frame_alloc();
+//        desFrame->channel_layout = frame->channel_layout;
+//        desFrame->sample_rate = frame->sample_rate;
+//        desFrame->format = AV_SAMPLE_FMT_S16;
+//        desFrame->nb_samples = frame->nb_samples;
+//        ret = swr_convert_frame(swr, desFrame, frame);
+//        int des_channels = av_get_channel_layout_nb_channels(desFrame->channel_layout);
+//        int dse_size = av_samples_get_buffer_size(NULL, des_channels, desFrame->nb_samples, des_fmt, 0);
+//        NSData *data1 = [NSData dataWithBytes:desFrame->data[0] length:dse_size];
+//        av_frame_free(&desFrame);
+//        [[LLCAudioDataQueue shareInstance] addData:data1];
+//        return;
         
-//        uint8_t **dstData = NULL;
-//        /* compute the number of converted samples: buffering is avoided
-//         * ensuring that the output buffer will contain at least all the
-//         * converted input samples */
+        /* compute the number of converted samples: buffering is avoided
+         * ensuring that the output buffer will contain at least all the
+         * converted input samples */
         int dst_nb_samples = (int)av_rescale_rnd(frame->nb_samples, frame->sample_rate, frame->sample_rate, AV_ROUND_UP);
        //frame->channel_layout(声道布局) 和 AV_CH_LAYOUT_STEREO(单声道还是立体声) 对应
         //根据声道布局计算出声道数
         int channels = av_get_channel_layout_nb_channels(frame->channel_layout);
-//        ret = av_samples_alloc_array_and_samples(&dstData, NULL, channels, dst_nb_samples, AV_SAMPLE_FMT_S16, 1);
         uint8_t *dstData = NULL;
         ret = av_samples_alloc(&dstData, NULL, channels, frame->sample_rate, AV_SAMPLE_FMT_S16, 0);
         if (ret <= 0) { return; }
         ret = swr_convert(swr, &dstData, dst_nb_samples, (const uint8_t **)frame->extended_data, frame->nb_samples);
-//        ret = swr_convert(swr, dstData, dst_nb_samples, (const uint8_t **)frame->data, frame->nb_samples);
         if (ret < 0){ printf("swr_convert error \n"); return; }
+        //计算数据大小
         int size = av_samples_get_buffer_size(NULL, channels, frame->nb_samples, AV_SAMPLE_FMT_S16, 0);
         
         NSData *data = [NSData dataWithBytes:dstData length:size];
         [[LLCAudioDataQueue shareInstance] addData:data];
-//        dispatch_async(audioPlayerQueue, ^{
-//            [_player playPCMData:dstData[0] size:size];
-////            free(copyData);
-//            if (dstData) {
-////                av_freep(&dstData);
-//                av_freep(&dstData[0]);
-//            }
-//        });
         if (dstData) {
             av_freep(&dstData);
-//            av_freep(&dstData[0]);
         }
     } else {
     }
@@ -149,8 +182,7 @@
     int audio_stream_idx;
     AVCodec *video_code = NULL;
     AVCodec *audio_code = NULL;
-    AVStream *video_stream;
-    AVStream *audio_stream;
+
     AVCodecContext *video_dec_ctx = NULL;
     AVCodecContext *audio_dec_ctx = NULL;
     AVDictionary *opts = NULL;
@@ -223,7 +255,6 @@
         return;
     }
     
-    
     static int refcount = 0;
     /* Init the decoders, with or without reference counting */
     av_dict_set(&opts, "refcounted_frames", refcount ? "1" : "0", 0);
@@ -238,7 +269,6 @@
 
     /* dump input information to stderr */
     av_dump_format(fmt_ctx, 0, src_filename, 0);
-
     
     video_frame = av_frame_alloc();
     if (!video_frame) {
@@ -256,18 +286,18 @@
     
     /* read frames from the file */
     while (av_read_frame(fmt_ctx, pkt) == 0) {
-        if (pkt->stream_index == video_stream_idx) {
-            ret = avcodec_send_packet(video_dec_ctx, pkt);
+        if (pkt->stream_index == audio_stream_idx) {
+            ret = avcodec_send_packet(audio_dec_ctx, pkt);
             if (ret != 0) {
                 printf("avcodec_send_packet failed.\n");
             }
-            ret = avcodec_receive_frame(video_dec_ctx, video_frame);      
+            ret = avcodec_receive_frame(audio_dec_ctx, audio_frame);
             switch (ret) {
                 case 0:
                     while (ret==0) {
-                        [self handleDecodeVideoFrame:video_frame];
-                        av_frame_unref(video_frame);
-                        ret = avcodec_receive_frame(video_dec_ctx, video_frame);
+                        [self handleDecodeAudioFrame:audio_frame];
+                        av_frame_unref(audio_frame);
+                        ret = avcodec_receive_frame(audio_dec_ctx, audio_frame);
                     }
                     break;
                 case AVERROR(EAGAIN):
@@ -280,18 +310,18 @@
                     printf("other error.. code: %d\n", AVERROR(ret));
                     break;
             }
-        } else if (pkt->stream_index == audio_stream_idx) {
-            ret = avcodec_send_packet(audio_dec_ctx, pkt);
+        } else if (pkt->stream_index == video_stream_idx) {
+            ret = avcodec_send_packet(video_dec_ctx, pkt);
             if (ret != 0) {
                 printf("avcodec_send_packet failed.\n");
             }
-            ret = avcodec_receive_frame(audio_dec_ctx, audio_frame);
+            ret = avcodec_receive_frame(video_dec_ctx, video_frame);      
             switch (ret) {
                 case 0:
                     while (ret==0) {
-                        [self handleDecodeAudioFrame:audio_frame];
-                        av_frame_unref(audio_frame);
-                        ret = avcodec_receive_frame(audio_dec_ctx, audio_frame);
+                        [self handleDecodeVideoFrame:video_frame];
+                        av_frame_unref(video_frame);
+                        ret = avcodec_receive_frame(video_dec_ctx, video_frame);
                     }
                     break;
                 case AVERROR(EAGAIN):

@@ -12,9 +12,6 @@
 @interface TMAudioPCMPlayer : NSObject
 
 - (instancetype)initWithConfig:(TMAudioConfig *)config;
-/**播放pcm*/
-- (void)playPCMData:(NSData *)data;
-- (void)playPCMData:(uint8_t *)data size:(UInt32)size;
 - (void)start;
 /** 设置音量增量 0.0 - 1.0 */
 - (void)setupVoice:(Float32)gain;
