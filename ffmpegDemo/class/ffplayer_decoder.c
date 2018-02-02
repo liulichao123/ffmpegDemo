@@ -342,7 +342,7 @@ double sysnchronize_video(VideoState *is, AVFrame *src_frame, double pts) {
     return pts;
 }
 
-//
+//计算多少毫秒后播放下一帧
 int video_refresh_timer(void *userdata) {
     
     VideoState *is = (VideoState *)userdata;
@@ -354,20 +354,25 @@ int video_refresh_timer(void *userdata) {
             return 1;
 //            schedule_refresh(is, 1);
         } else {
+            /**
+             存在同步问题，视频稍快
+             
+             */
             vp = is->pictq[is->pictq_rindex];
-            
-            delay = vp->pts - is->frame_last_pts; /* the pts from last time */
+            //单位秒
+            delay = (vp->pts - is->frame_last_pts)/is->video_stream->time_base.den; /* the pts from last time */
             if(delay <= 0 || delay >= 1.0) {
                 /* if incorrect delay, use previous one */
                 delay = is->frame_last_delay;
             }
+     
             /* save for next time */
             is->frame_last_delay = delay;
             is->frame_last_pts = vp->pts;
             
             /* update delay to sync to audio */
             ref_clock = get_audio_clock(is);
-            diff = vp->pts - ref_clock;
+            diff = vp->pts/is->video_stream->time_base.den - ref_clock;
             
             /* Skip or repeat the frame. Take delay into account
              FFPlay still doesn't "know if this is the best guess." */
@@ -379,6 +384,7 @@ int video_refresh_timer(void *userdata) {
                     delay = 2 * delay;
                 }
             }
+            
             is->frame_timer += delay;
             /* computer the REAL delay */
             actual_delay = is->frame_timer - (av_gettime() / 1000000.0);
@@ -386,6 +392,7 @@ int video_refresh_timer(void *userdata) {
                 /* Really it should skip the picture instead */
                 actual_delay = 0.010;
             }
+            printf("%f\n",actual_delay);
             //设置多长时间后显示下一帧
 //            schedule_refresh(is, (int)(actual_delay * 1000 + 0.5));
             return  (int)(actual_delay * 1000 + 0.5);
@@ -410,7 +417,7 @@ int video_refresh_timer(void *userdata) {
 AVFrame* display_thread(VideoState *is) {
     AVFrame *frame = is->pictq[0];
     while (!frame) {
-        usleep(1000*80);
+        usleep(1000*10);
         frame = is->pictq[0];
     }
     SDL_LockMutex(is->pictq_mutex);
@@ -543,18 +550,24 @@ int audio_paly_callback(uint8_t *data) {
 int start_main(VideoState *is, void *(*videoCallBack)(void *)) {
     is->parse_tid = SDL_CreateThread(decode_thread, is);
     usleep(1000 * 100);//100ms
+    AVFrame *lastFrame = NULL;
+    AVFrame *frame = NULL;
     for (;;) {
-        AVFrame *frame = display_thread(is);
+        if (lastFrame) {
+            av_frame_unref(lastFrame);//
+        }
+        lastFrame = frame;
+        frame = display_thread(is);
         if (frame) {
             videoCallBack(frame);
-            av_frame_unref(frame);
+//            av_frame_unref(frame);//
 //            if (frame != NULL) {
 //                av_frame_free(&frame);
 //            }
         }
-        usleep(1000 * 80);//80ms
-//        int sleep = video_refresh_timer(is);
-//        usleep(sleep * 1000);
+//        usleep(1000 * 80);//80ms
+        int sleep = video_refresh_timer(is);//秒
+        usleep(sleep * 1000);
     }
     
     return 0;
